@@ -4,7 +4,7 @@
 import cv2
 
 class ObjectTracker():
-    def __init__(self,type='MOSSE'):
+    def __init__(self,type='CSRT'):
         self.type = type
         self.trackers = cv2.legacy.MultiTracker_create()
         self.numTrackers = 0

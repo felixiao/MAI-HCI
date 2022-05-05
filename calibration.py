@@ -40,6 +40,7 @@ class Calibration():
         gray_img = cv2.cvtColor(self.capturedImage, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray_img, (blursize, blursize), 0)             # 高斯模糊去噪（设定卷积核大小影响效果）
         _, RedThresh = cv2.threshold(blurred, threshold, 255, cv2.THRESH_BINARY)  # 设定阈值165（阈值影响开闭运算效果）
+        # cv2.imwrite('binary.jpg',RedThresh)
         cnts = cv2.findContours(RedThresh.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         cnts = imutils.grab_contours(cnts)
         c = sorted(cnts, key=cv2.contourArea, reverse=True)[0]              # 计算最大轮廓的旋转包围盒
@@ -63,6 +64,7 @@ class Calibration():
             print(f'[3-0] = {approx[3]-approx[0]}')
             cv2.drawContours(self.capturedImage, [c], -1, (0, 255, 0), 3)
             cv2.imshow("Image", self.capturedImage)
+            # cv2.imwrite('CamContour.jpg',self.capturedImage)
             flip = None
             rotation = 90
             while True:
