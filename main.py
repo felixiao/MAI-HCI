@@ -116,8 +116,14 @@ class HCI():
         self.cap.release()
         cv2.destroyAllWindows()
 
+    def painter(self,point):
+        whiteboard = np.ones((self.SCREEN_HEIGHT,self.SCREEN_WIDTH,3),dtype=np.uint8)*255
+        self.points.append(point)
+
+        for p in self.points:
+            cv2.circle(whiteboard,(p[0],p[1]),5,(200,0,0),2)
 if __name__ == '__main__':
     hci=HCI()
-    hci.FingerTipTest()
-    # hci.setup(False)
-    # hci.render()
+    # hci.FingerTipTest()
+    hci.setup()
+    hci.render()
