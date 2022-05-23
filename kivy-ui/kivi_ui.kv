@@ -1,6 +1,100 @@
 #:import st stylesheet
 
 
+<MagicalNumber>:
+    orientation: 'horizontal'
+    spacing: 25
+    padding: 100
+    TextInput:
+        text: 'Magical number'
+        id: gen_number
+        size_hint: (.2, None)
+        height: st.TEXT_FONT_SIZE + 15
+        pos_hint: {'center_x': .5, 'center_y': .9}
+        multiline: False
+        font_size: st.TEXT_FONT_SIZE
+    Button:
+        text: 'Generate!'
+        on_press: root.clicked()
+        size_hint: (.2, None)
+        height: st.TEXT_FONT_SIZE + 15
+        pos_hint: {'center_x': .5, 'center_y': .9}
+        font_size: st.TEXT_FONT_SIZE
+
+<SelectableLabel>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: (.0, 0.9, .1, .3) if self.selected else (0, 0, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<MelodiesList>:
+    viewclass: 'SelectableLabel'
+    SelectableRecycleBoxLayout:
+        id: list
+        default_size: None, dp(56)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: True
+
+
+<ComposeFromScratch>:
+    orientation: 'vertical'
+    Label:
+        text: 'Let DeejAI create a brand new song from scratch! \nWell, almost - you need to provide him with a magical number, \nDeejAI will base the new song on it. What magical number will create the best hit?'
+        font_size: st.TEXT_FONT_SIZE
+        size_hint: 1, 0.2
+    MagicalNumber:
+        id: magical_number
+
+
+<AccompanyMelody>:
+    orientation: 'vertical'
+    Label:
+        text: 'Do you have a melody that needs to be enhanced to the next level?\nYou are at the right place! Upload your melody (as MIDI file), or choose from our tracks.\nDeejAI will add other instruments and generate rich new song!'
+        font_size: st.TEXT_FONT_SIZE
+        size_hint: 1, 0.2
+    BoxLayout:
+        orientation: 'horizontal'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Wanna give it a try with one of these melodies?'
+                font_size: st.TEXT_FONT_SIZE
+                size_hint: 1, 0.2
+            MelodiesList:
+                id: melodies_list
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+            padding: 100, 0, 100, 50
+            Label:
+                text: 'You have your own cool melody? Upload your MIDI file:'
+                font_size: st.TEXT_FONT_SIZE
+                size_hint: 1, 0.2
+            StackLayout:
+                orientation: 'tb-lr'
+                spacing: 20
+                TextInput:
+                    text: 'path/melody.midi'
+                    id: upload_midi
+                    multiline: False
+                    size_hint: 1, None
+                    height: st.TEXT_FONT_SIZE + 15
+                Button:
+                    text: 'Upload'
+                    size_hint: 1, None
+                    height: st.TEXT_FONT_SIZE + 15
+                    on_press: root.upload_midi()
+    MagicalNumber:
+        id: magical_number
+
+
 <FeatureTabs>:
     do_default_tab: False
     tab_width: self.parent.width / 3
@@ -11,39 +105,14 @@
         background_color: 255, 255, 255, 1
         color: 0, 0, 0, 1
         on_press: root.switch_tab(self)
-        BoxLayout:
-            orientation: 'vertical'
-            Label:
-                text: 'Let DeejAI create a brand new song from scratch! \nWell, almost - you need to provide him with a magical number, \nDeejAI will base the new song on it. What magical number will create the best hit?'
-                font_size: st.TEXT_FONT_SIZE
-                size_hint: 1, 0.3
-            BoxLayout:
-                orientation: 'horizontal'
-                spacing: 25
-                padding: 100
-                TextInput:
-                    text: 'Magical number'
-                    id: gen_number
-                    size_hint: (.2, None)
-                    height: st.TEXT_FONT_SIZE + 15
-                    pos_hint: {'center_x': .5, 'center_y': .9}
-                    multiline: False
-                    font_size: st.TEXT_FONT_SIZE
-                Button:
-                    text: 'Generate!'
-                    on_press: root.generate_from_scratch()
-                    size_hint: (.2, None)
-                    height: st.TEXT_FONT_SIZE + 15
-                    pos_hint: {'center_x': .5, 'center_y': .9}
-                    font_size: st.TEXT_FONT_SIZE
+        ComposeFromScratch
     TabbedPanelItem:
         text: 'Accompany melody'
         font_size: st.H3_FONT_SIZE
         background_color: 255, 255, 255, 1
         color: 0, 0, 0, 1
         on_press: root.switch_tab(self)
-        Label:
-            text: 'Accompany melody blah blah...'
+        AccompanyMelody
     TabbedPanelItem:
         text: 'Continue track'
         font_size: st.H3_FONT_SIZE
