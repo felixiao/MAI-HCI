@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.tabbedpanel import TabbedPanel
 
@@ -11,7 +12,15 @@ class FeatureTabs(TabbedPanel):
             if tab == clicked_tab:
                 tab.font_size = st.H2_FONT_SIZE
             else:
-                tab.font_size = st.TEXT_FONT_SIZE
+                tab.font_size = st.H3_FONT_SIZE
+
+    def generate_from_scratch(self):
+        input_str = self.ids.gen_number.text
+        try:
+            number = int(input_str)
+            print(number)
+        except ValueError:
+            self.ids.gen_number.text = "Please input a whole number"
 
 
 class KiviUi(BoxLayout):
@@ -24,4 +33,5 @@ class KiviUiApp(App):
 
 
 if __name__ == '__main__':
+    Builder.load_file('kivi_ui.kv')
     KiviUiApp().run()

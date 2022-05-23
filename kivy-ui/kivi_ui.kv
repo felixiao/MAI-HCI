@@ -1,0 +1,70 @@
+#:import st stylesheet
+
+
+<FeatureTabs>:
+    do_default_tab: False
+    tab_width: self.parent.width / 3
+    TabbedPanelItem:
+        text: 'Compose from scratch'
+        # default tab -> larger size on the beginning
+        font_size: st.H2_FONT_SIZE
+        background_color: 255, 255, 255, 1
+        color: 0, 0, 0, 1
+        on_press: root.switch_tab(self)
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Let DeejAI create a brand new song from scratch! \nWell, almost - you need to provide him with a magical number, \nDeejAI will base the new song on it. What magical number will create the best hit?'
+                font_size: st.TEXT_FONT_SIZE
+                size_hint: 1, 0.3
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                padding: 100
+                TextInput:
+                    text: 'Magical number'
+                    id: gen_number
+                    size_hint: (.2, None)
+                    height: st.TEXT_FONT_SIZE + 15
+                    pos_hint: {'center_x': .5, 'center_y': .9}
+                    multiline: False
+                    font_size: st.TEXT_FONT_SIZE
+                Button:
+                    text: 'Generate!'
+                    on_press: root.generate_from_scratch()
+                    size_hint: (.2, None)
+                    height: st.TEXT_FONT_SIZE + 15
+                    pos_hint: {'center_x': .5, 'center_y': .9}
+                    font_size: st.TEXT_FONT_SIZE
+    TabbedPanelItem:
+        text: 'Accompany melody'
+        font_size: st.H3_FONT_SIZE
+        background_color: 255, 255, 255, 1
+        color: 0, 0, 0, 1
+        on_press: root.switch_tab(self)
+        Label:
+            text: 'Accompany melody blah blah...'
+    TabbedPanelItem:
+        text: 'Continue track'
+        font_size: st.H3_FONT_SIZE
+        background_color: 255, 255, 255, 1
+        color: 0, 0, 0, 1
+        on_press: root.switch_tab(self)
+        Label:
+            text: 'Continue from track blah blah...'
+
+
+<KiviUi>:
+    orientation: 'vertical'
+    canvas:
+        Color:
+            rgba: 255, 255, 255, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        text: 'DeejAI'
+        size_hint: 1, 0.2
+        font_size: st.H1_FONT_SIZE
+        color: 0, 0, 0, 1
+    FeatureTabs
