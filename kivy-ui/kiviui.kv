@@ -1,0 +1,46 @@
+#:import st stylesheet
+
+<FeatureTabs>:
+    do_default_tab: False
+    tab_width: self.parent.width / 3
+    TabbedPanelItem:
+        text: 'Compose from scratch'
+        # default tab
+        font_size: st.H2_FONT_SIZE
+        background_color: 255, 255, 255, 1
+        color: 0, 0, 0, 1
+        on_press: root.switch_tab(self)
+        Label:
+            text: 'Compose from scratch blah blah...'
+    TabbedPanelItem:
+        text: 'Accompany melody'
+        font_size: st.TEXT_FONT_SIZE
+        background_color: 255, 255, 255, 1
+        color: 0, 0, 0, 1
+        on_press: root.switch_tab(self)
+        Label:
+            text: 'Accompany melody blah blah...'
+    TabbedPanelItem:
+        text: 'Continue from track'
+        font_size: st.TEXT_FONT_SIZE
+        background_color: 255, 255, 255, 1
+        color: 0, 0, 0, 1
+        on_press: root.switch_tab(self)
+        Label:
+            text: 'Continue from track blah blah...'
+
+
+<KiviUi>:
+    orientation: 'vertical'
+    canvas:
+        Color:
+            rgba: 255, 255, 255, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        text: 'DeejAI'
+        size_hint: 1, 0.2
+        font_size: st.H1_FONT_SIZE
+        color: 0, 0, 0, 1
+    FeatureTabs
