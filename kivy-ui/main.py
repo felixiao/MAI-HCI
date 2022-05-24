@@ -34,21 +34,29 @@ class AccompanyMelody(BoxLayout, MagicalNumberSubscriber, metaclass=AccompanyMel
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_once(lambda dt: self.ids.magical_number.subscribe(self))
+        Clock.schedule_once(lambda dt: self.ids.melodies_list.layout_manager.bind(selected_nodes=self.select_melody_from_list))
         self.melody = None
+
+    def select_melody(self, melody):
+        self.melody = melody
+        self.ids.selected_melody.text = f"Selected melody: {melody}"
 
     def update(self, number: int):
         if self.melody is None:
-            mel_list = self.ids.melodies_list
-            self.melody = mel_list.data[mel_list.layout_manager.selected_nodes[0]]
-            print(f"Accompanying selected melody {self.melody} with number {number}")
+            self.ids.selected_melody.text = f"You need to select melody first!"
         else:
-            print(f"Accompanying given melody {self.melody} with number {number}")
+            print(f"Accompanying melody {self.melody} with number {number}")
+
+    def select_melody_from_list(self, melodies_list, event):
+        if len(melodies_list.selected_nodes) > 0:
+            melodies = melodies_list.recycleview.data
+            # data in melodies list are dictionaries {'text': [name of the song]}
+            self.select_melody(melodies[melodies_list.selected_nodes[0]]['text'])
 
     def upload_midi(self):
         input_str = self.ids.upload_midi.text
         if os.path.exists(input_str):
-            self.melody = input_str
-            print(input_str)
+            self.select_melody(input_str)
         else:
             self.ids.upload_midi.text = "Please input valid file path"
 

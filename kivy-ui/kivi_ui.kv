@@ -51,6 +51,7 @@
         size_hint: 1, 0.2
     MagicalNumber:
         id: magical_number
+        size_hint: 1, 0.8
 
 
 <AccompanyMelody>:
@@ -61,6 +62,7 @@
         size_hint: 1, 0.2
     BoxLayout:
         orientation: 'horizontal'
+        size_hint: 1, 0.6
         BoxLayout:
             orientation: 'vertical'
             Label:
@@ -91,8 +93,14 @@
                     size_hint: 1, None
                     height: st.TEXT_FONT_SIZE + 15
                     on_press: root.upload_midi()
+    Label:
+        text: "Selected melody: -"
+        id: selected_melody
+        size_hint: 1, None
+        height: st.TEXT_FONT_SIZE + 15
     MagicalNumber:
         id: magical_number
+        size_hint: 1, 0.2
 
 
 <FeatureTabs>:
