@@ -23,6 +23,7 @@ class ComposeFromScratch(BoxLayout, MagicalNumberSubscriber, metaclass=ComposeFr
         Clock.schedule_once(lambda dt: self.ids.magical_number.subscribe(self))
 
     def update(self, number: int):
+        # TODO: Generate music with AI
         print(f"Composing from scratch with number {number}")
 
 
@@ -45,6 +46,7 @@ class AccompanyMelody(BoxLayout, MagicalNumberSubscriber, metaclass=AccompanyMel
         if self.melody is None:
             self.ids.selected_melody.text = f"You need to select melody first!"
         else:
+            # TODO: Accompany melody with AI
             print(f"Accompanying melody {self.melody} with number {number}")
 
     def select_melody_from_list(self, melodies_list, event):

@@ -4,7 +4,7 @@
 <MagicalNumber>:
     orientation: 'horizontal'
     spacing: 25
-    padding: 100
+    padding: 20
     TextInput:
         text: 'Magical number'
         id: gen_number
@@ -96,11 +96,13 @@
     Label:
         text: "Selected melody: -"
         id: selected_melody
-        size_hint: 1, None
-        height: st.TEXT_FONT_SIZE + 15
+        size_hint: 1, 0.1
+        text_size: root.width, st.TEXT_FONT_SIZE + 15
+        halign: 'center'
+        valign: 'middle'
     MagicalNumber:
         id: magical_number
-        size_hint: 1, 0.2
+        size_hint: 1, 0.1
 
 
 <FeatureTabs>:
