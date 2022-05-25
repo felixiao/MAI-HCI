@@ -1,14 +1,20 @@
 import os.path
+import threading
+import time
 
 from kivy.animation import Animation
 from kivy.app import App
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
+from kivy.core.audio import SoundLoader
 from kivy.lang import Builder
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, ListProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.tabbedpanel import TabbedPanel
+
+# TODO: import ffpyplayer needs to be here to be able to play wav
+import ffpyplayer
 
 import stylesheet as st
 # MagicalNumber and MelodiesList NEEDS TO BE IMPORTED HERE (so kivy finds the class)
@@ -36,17 +42,36 @@ class ComposeFromScratchMeta(type(BoxLayout), type(MagicalNumberSubscriber)):
 
 
 class ComposeFromScratch(BoxLayout, MagicalNumberSubscriber, metaclass=ComposeFromScratchMeta):
+    generation_result = ListProperty()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_once(lambda dt: self.ids.magical_number.subscribe(self))
-        self.is_generating = False
+        Clock.schedule_once(lambda dt: self.bind(generation_result=self.show_gen_result))
+        self.gen_animation = None
+
+    def ai_generating(self, number):
+        print(f"Composing from scratch with number {number}")
+        time.sleep(2)
+        self.generation_result.append(5)
+
+    @mainthread
+    def show_gen_result(self, self_ref, generation_result_list):
+        self.remove_widget(self.gen_animation)
+        self.gen_animation = None
+        print(f"Generation done: {generation_result_list}")
+        sound = SoundLoader.load('resources/mambo_no_5-lou_bega.wav')  # TODO: change to generated song
+        if sound:
+            sound.seek(0)
+            sound.play()
 
     def update(self, number: int):
         # TODO: Generate music with AI
-        print(f"Composing from scratch with number {number}")
-        if not self.is_generating:
-            self.add_widget(GeneratingAnimation())
-            self.is_generating = True
+        if self.gen_animation is None:
+            self.gen_animation = GeneratingAnimation()
+            self.add_widget(self.gen_animation)
+            gen_thread = threading.Thread(target=self.ai_generating, args=(number,), daemon=True)
+            gen_thread.start()
 
 
 class MidiFileUpload(StackLayout):
