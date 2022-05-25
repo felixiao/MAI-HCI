@@ -17,10 +17,6 @@ class Calibration():
     def Capture(self,cameraIndex=0):
         SCREEN_WIDTH = 1080
         SCREEN_HEIGHT= 720
-
-        cap = cv2.VideoCapture(1)
-        threshold = 127
-        brightness = 127
         cap = cv2.VideoCapture(cameraIndex)
 
         while cap.isOpened():

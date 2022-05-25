@@ -6,12 +6,6 @@ from imutils.video import FPS
 # import qrtracker
 import time
 
-
-# TODO: 
-# 1. Intergrat with kivy UI
-# Instructions:
-# 
-
 from pyzbar.pyzbar import decode
 import cv2
 import numpy as np
@@ -36,7 +30,6 @@ class HCI():
         self.handTracker = HandTracker()
         self.objectTracker = ObjectTracker()
         self.shapeTracker = ShapeTracker()
-        self.cap = cv2.VideoCapture(1)
         self.cameraIndex= cameraIndex
         self.cap = cv2.VideoCapture(cameraIndex)
         self.SCREEN_WIDTH = 1280
@@ -154,6 +147,5 @@ class HCI():
 if __name__ == '__main__':
     hci=HCI()
     # hci.FingerTipTest()
-    hci.setup(False)
     hci.setup(False,False)
     hci.render()
