@@ -1,10 +1,14 @@
-from concurrent.futures import thread
 from calibration import *
 from handtracking import *
 from objecttracking import *
 from shapetracking import *
 from imutils.video import FPS
 import time
+
+# TODO: 
+# 1. Intergrat with kivy UI
+# Instructions:
+# 
 
 class HCI():
     def __init__(self):
@@ -13,7 +17,7 @@ class HCI():
         self.handTracker = HandTracker()
         self.objectTracker = ObjectTracker()
         self.shapeTracker = ShapeTracker()
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(1)
         self.SCREEN_WIDTH = 1280
         self.SCREEN_HEIGHT= 720
         self.fps = None
@@ -57,7 +61,7 @@ class HCI():
 
     def render(self):
         self.fps = FPS().start()
-        flip = 1
+        flip = None
         rotation = 90
         showInfo = True
         showCam =True
@@ -125,5 +129,5 @@ class HCI():
 if __name__ == '__main__':
     hci=HCI()
     # hci.FingerTipTest()
-    hci.setup()
+    hci.setup(False)
     hci.render()
