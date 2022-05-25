@@ -1,6 +1,7 @@
 import os.path
 import threading
 import time
+import os
 
 from kivy.animation import Animation
 from kivy.app import App
@@ -13,6 +14,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.core.audio import SoundLoader
+from kivy.uix.image import Image
 
 # TODO: import ffpyplayer needs to be here to be able to play wav
 import ffpyplayer
@@ -23,6 +26,8 @@ import stylesheet as st
 from magical_number import MagicalNumber, MagicalNumberSubscriber
 from melodies_list import MelodiesList
 
+from utils import npz_to_mid
+from utils import mid_to_wav
 
 class GeneratingAnimation(FloatLayout):
     angle = NumericProperty(0)
@@ -61,13 +66,26 @@ class ComposeFromScratch(BoxLayout, MagicalNumberSubscriber, metaclass=ComposeFr
     def show_gen_result(self, self_ref, generation_result_list):
         self.remove_widget(self.gen_animation)
         self.gen_animation = None
-        print(f"Generation done: {generation_result_list}")
-        sound = SoundLoader.load('resources/mambo_no_5-lou_bega.wav')  # TODO: change to generated song
+
+        npz_file = 'musegan/exp/default/results/inference/pianorolls/fake_x_hard_thresholding/fake_x_hard_thresholding_9.npz'
+        midi_file = 'musegan/out/out.mid'
+        npz_to_mid(npz_file, midi_file)
+        wav_file = mid_to_wav(midi_file)
+        sound = SoundLoader.load(wav_file)
         if sound:
-            sound.seek(0)
+            print("Sound found at %s" % sound.source)
+            print("Sound is %.3f seconds" % sound.length)
             sound.play()
-        video_player = VideoPlayer(source='resources/panda.avi', state='play', options={'eos': 'loop'})
-        self.add_widget(video_player)
+
+        print(f"Generation done: {generation_result_list}")
+        #sound = SoundLoader.load('resources/mambo_no_5-lou_bega.wav')  # TODO: change to generated song
+        #if sound:
+        #    sound.seek(0)
+        #    sound.play()
+        img = Image(source='resources/music.gif')
+        #video_player = VideoPlayer(source='resources/panda.avi', state='play', options={'eos': 'loop'})
+        self.add_widget(img)
+        #self.add_widget(video_player)
 
     def update(self, number: int):
         # TODO: Generate music with AI
@@ -76,6 +94,8 @@ class ComposeFromScratch(BoxLayout, MagicalNumberSubscriber, metaclass=ComposeFr
             self.add_widget(self.gen_animation)
             gen_thread = threading.Thread(target=self.ai_generating, args=(number,), daemon=True)
             gen_thread.start()
+            os.system('./musegan/scripts/run_inference.sh "./musegan/exp/default/" "0"')
+
 
 
 class MidiFileUpload(StackLayout):
@@ -117,7 +137,6 @@ class ContinueTrack(BoxLayout, MagicalNumberSubscriber, metaclass=ContinueTrackM
             self.select_melody(input_str)
         else:
             self.ids.midi_upload.ids.upload_input.text = "Please input valid file path"
-
 
 class AccompanyMelodyMeta(type(BoxLayout), type(MagicalNumberSubscriber)):
     pass
