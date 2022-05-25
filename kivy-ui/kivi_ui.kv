@@ -43,6 +43,22 @@
         touch_multiselect: True
 
 
+<MidiFileUpload>:
+    orientation: 'tb-lr'
+    spacing: 20
+    TextInput:
+        text: 'path/melody.midi'
+        id: upload_input
+        multiline: False
+        size_hint: 1, None
+        height: st.TEXT_FONT_SIZE + 15
+    Button:
+        text: 'Upload'
+        id: upload_button
+        size_hint: 1, None
+        height: st.TEXT_FONT_SIZE + 15
+
+
 <ComposeFromScratch>:
     orientation: 'vertical'
     Label:
@@ -79,20 +95,8 @@
                 text: 'You have your own cool melody? Upload your MIDI file:'
                 font_size: st.TEXT_FONT_SIZE
                 size_hint: 1, 0.2
-            StackLayout:
-                orientation: 'tb-lr'
-                spacing: 20
-                TextInput:
-                    text: 'path/melody.midi'
-                    id: upload_midi
-                    multiline: False
-                    size_hint: 1, None
-                    height: st.TEXT_FONT_SIZE + 15
-                Button:
-                    text: 'Upload'
-                    size_hint: 1, None
-                    height: st.TEXT_FONT_SIZE + 15
-                    on_press: root.upload_midi()
+            MidiFileUpload:
+                id: midi_upload
     Label:
         text: "Selected melody: -"
         id: selected_melody

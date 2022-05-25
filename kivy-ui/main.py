@@ -5,6 +5,7 @@ from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.recycleview import RecycleView
+from kivy.uix.stacklayout import StackLayout
 from kivy.uix.tabbedpanel import TabbedPanel
 
 import stylesheet as st
@@ -27,6 +28,10 @@ class ComposeFromScratch(BoxLayout, MagicalNumberSubscriber, metaclass=ComposeFr
         print(f"Composing from scratch with number {number}")
 
 
+class MidiFileUpload(StackLayout):
+    pass
+
+
 class AccompanyMelodyMeta(type(BoxLayout), type(MagicalNumberSubscriber)):
     pass
 
@@ -35,6 +40,7 @@ class AccompanyMelody(BoxLayout, MagicalNumberSubscriber, metaclass=AccompanyMel
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_once(lambda dt: self.ids.magical_number.subscribe(self))
+        Clock.schedule_once(lambda dt: self.ids.midi_upload.ids.upload_button.bind(on_press=self.upload_midi))
         Clock.schedule_once(lambda dt: self.ids.melodies_list.layout_manager.bind(selected_nodes=self.select_melody_from_list))
         self.melody = None
 
@@ -55,12 +61,12 @@ class AccompanyMelody(BoxLayout, MagicalNumberSubscriber, metaclass=AccompanyMel
             # data in melodies list are dictionaries {'text': [name of the song]}
             self.select_melody(melodies[melodies_list.selected_nodes[0]]['text'])
 
-    def upload_midi(self):
-        input_str = self.ids.upload_midi.text
+    def upload_midi(self, button):
+        input_str = self.ids.midi_upload.ids.upload_input.text
         if os.path.exists(input_str):
             self.select_melody(input_str)
         else:
-            self.ids.upload_midi.text = "Please input valid file path"
+            self.ids.midi_upload.ids.upload_input.text = "Please input valid file path"
 
 
 class FeatureTabs(TabbedPanel):
