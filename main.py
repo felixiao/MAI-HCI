@@ -3,21 +3,42 @@ from handtracking import *
 from objecttracking import *
 from shapetracking import *
 from imutils.video import FPS
+# import qrtracker
 import time
+
 
 # TODO: 
 # 1. Intergrat with kivy UI
 # Instructions:
 # 
 
+from pyzbar.pyzbar import decode
+import cv2
+import numpy as np
+
+def trackingQRCode(image,drawImg=None,show=True):
+    try:
+        qrobj =decode(image)
+        if qrobj and show and drawImg is not None:
+            for obj in qrobj:
+                pts = obj.polygon
+                pts = np.array([pts],np.int32)
+                pts = pts.reshape((4,1,2))
+                cv2.polylines(drawImg,[pts],True,(255,255,0),2) 
+        return decode(image)
+    except:
+        return []
+
 class HCI():
-    def __init__(self):
+    def __init__(self,cameraIndex=1):
         print('init')
         self.calib = Calibration('pygameproj/calib.jpg','pygameproj/cap.jpg')
         self.handTracker = HandTracker()
         self.objectTracker = ObjectTracker()
         self.shapeTracker = ShapeTracker()
         self.cap = cv2.VideoCapture(1)
+        self.cameraIndex= cameraIndex
+        self.cap = cv2.VideoCapture(cameraIndex)
         self.SCREEN_WIDTH = 1280
         self.SCREEN_HEIGHT= 720
         self.fps = None
@@ -54,10 +75,10 @@ class HCI():
         self.cap.release()
         cv2.destroyAllWindows()
 
-    def setup(self,capture=True):
+    def setup(self,capture=True,showQuadDetec=True):
         if capture:
-            self.calib.Capture()
-        self.calib.QuadDetection()
+            self.calib.Capture(self.cameraIndex)
+        self.calib.QuadDetection(show=showQuadDetec)
 
     def render(self):
         self.fps = FPS().start()
@@ -77,8 +98,9 @@ class HCI():
             corpImg = self.calib.Process(imgRGB,flip=flip,rotation=rotation)
             results = self.handTracker.Detect(corpImg,whiteboard)
             bboxes = self.objectTracker.Detect(corpImg,whiteboard)
-            self.shapeTracker.Detect(corpImg,whiteboard,threshold=threshold)
-            
+            self.shapeTracker.Detect(corpImg,whiteboard,threshold=threshold,show=showCam)
+            trackingQRCode(corpImg,whiteboard,show=showCam)
+
             if showInfo:
                 self.fps.update()
                 self.fps.stop()
@@ -88,7 +110,10 @@ class HCI():
             cv2.imshow("original", whiteboard)
             if showCam:
                 corpImg = cv2.cvtColor(corpImg,cv2.COLOR_RGB2BGR)
-                cv2.imshow("Cam", corpImg)
+                corpImg = cv2.resize(corpImg,(128,80))
+                whiteboard[:corpImg.shape[0],:corpImg.shape[1],:] = corpImg
+                # cv2.imshow("Cam", corpImg)
+            cv2.imshow("original", whiteboard)
             key = cv2.waitKey(1) & 0xFF
             if key == ord('t'):
                 threshold = (threshold+10) % 255
@@ -130,4 +155,5 @@ if __name__ == '__main__':
     hci=HCI()
     # hci.FingerTipTest()
     hci.setup(False)
+    hci.setup(False,False)
     hci.render()

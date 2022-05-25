@@ -14,31 +14,23 @@ class Calibration():
         self.transformMatrix = None
         self.dsize = None
 
-    def Capture(self):
+    def Capture(self,cameraIndex=0):
         SCREEN_WIDTH = 1080
         SCREEN_HEIGHT= 720
+
         cap = cv2.VideoCapture(1)
         threshold = 127
         brightness = 127
+        cap = cv2.VideoCapture(cameraIndex)
+
         while cap.isOpened():
             _, frame = cap.read()
             if frame is None:
                 break
-            h,w,c = frame.shape
-            scaleimg = cv2.resize(frame,(int(w/4),int(h/4)))
-            gray_img = cv2.cvtColor(scaleimg, cv2.COLOR_BGR2GRAY)
-            blurred = cv2.GaussianBlur(gray_img, (9, 9), 0)             # 高斯模糊去噪（设定卷积核大小影响效果）
-            _, RedThresh = cv2.threshold(blurred, threshold, 255, cv2.THRESH_BINARY)  # 设定阈值165（阈值影响开闭运算效果)
-            cv2.imshow("Cam", RedThresh)
-            whiteboard = np.ones((SCREEN_HEIGHT,SCREEN_WIDTH,3),dtype=np.uint8)*brightness
-            cv2.imshow("original", whiteboard)
-            # cv2.imshow("original", self.calibimage)
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord('b'):
-                brightness = (brightness+10) % 255
-            if key == ord('t'):
-                threshold = (threshold+10) % 255
-                print(threshold)
+            cv2.imshow("Cam", frame,)
+            # whiteboard = np.ones((SCREEN_HEIGHT,SCREEN_WIDTH,3),dtype=np.uint8)*127
+            cv2.imshow("original", self.calibimage)
+            key = cv2.waitKey(1) & 0xFF    
             if key == ord('c'):
                 self.capturedImage = frame
                 cv2.imwrite(self.capturedImagePath,frame)
