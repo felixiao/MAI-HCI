@@ -6,6 +6,7 @@ from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock, mainthread
 from kivy.core.audio import SoundLoader
+from kivy.core.video import Video
 from kivy.lang import Builder
 from kivy.properties import NumericProperty, ListProperty
 from kivy.uix.boxlayout import BoxLayout
@@ -15,6 +16,7 @@ from kivy.uix.tabbedpanel import TabbedPanel
 
 # TODO: import ffpyplayer needs to be here to be able to play wav
 import ffpyplayer
+from kivy.uix.videoplayer import VideoPlayer
 
 import stylesheet as st
 # MagicalNumber and MelodiesList NEEDS TO BE IMPORTED HERE (so kivy finds the class)
@@ -64,6 +66,8 @@ class ComposeFromScratch(BoxLayout, MagicalNumberSubscriber, metaclass=ComposeFr
         if sound:
             sound.seek(0)
             sound.play()
+        video_player = VideoPlayer(source='resources/panda.avi', state='play', options={'eos': 'loop'})
+        self.add_widget(video_player)
 
     def update(self, number: int):
         # TODO: Generate music with AI
