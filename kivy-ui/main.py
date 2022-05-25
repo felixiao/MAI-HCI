@@ -4,7 +4,6 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.recycleview import RecycleView
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.tabbedpanel import TabbedPanel
 
@@ -30,6 +29,43 @@ class ComposeFromScratch(BoxLayout, MagicalNumberSubscriber, metaclass=ComposeFr
 
 class MidiFileUpload(StackLayout):
     pass
+
+
+class ContinueTrackMeta(type(BoxLayout), type(MagicalNumberSubscriber)):
+    pass
+
+
+class ContinueTrack(BoxLayout, MagicalNumberSubscriber, metaclass=ContinueTrackMeta):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_once(lambda dt: self.ids.magical_number.subscribe(self))
+        Clock.schedule_once(lambda dt: self.ids.midi_upload.ids.upload_button.bind(on_press=self.upload_midi))
+        Clock.schedule_once(lambda dt: self.ids.melodies_list.layout_manager.bind(selected_nodes=self.select_melody_from_list))
+        self.melody = None
+
+    def select_melody(self, melody):
+        self.melody = melody
+        self.ids.selected_melody.text = f"Selected song: {melody}"
+
+    def update(self, number: int):
+        if self.melody is None:
+            self.ids.selected_melody.text = f"You need to select song first!"
+        else:
+            # TODO: Continue track with AI
+            print(f"Continue track {self.melody} with number {number}")
+
+    def select_melody_from_list(self, melodies_list, event):
+        if len(melodies_list.selected_nodes) > 0:
+            melodies = melodies_list.recycleview.data
+            # data in melodies list are dictionaries {'text': [name of the song]}
+            self.select_melody(melodies[melodies_list.selected_nodes[0]]['text'])
+
+    def upload_midi(self, button):
+        input_str = self.ids.midi_upload.ids.upload_input.text
+        if os.path.exists(input_str):
+            self.select_melody(input_str)
+        else:
+            self.ids.midi_upload.ids.upload_input.text = "Please input valid file path"
 
 
 class AccompanyMelodyMeta(type(BoxLayout), type(MagicalNumberSubscriber)):

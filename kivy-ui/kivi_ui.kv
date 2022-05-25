@@ -69,6 +69,46 @@
         id: magical_number
         size_hint: 1, 0.8
 
+# TODO: refactor this - it is the same layout as for accompanying melody
+<ContinueTrack>:
+    orientation: 'vertical'
+    Label:
+        text: 'Do you have a beginning of a song, but you cannot think of a way how to continue it?\nOr select one of the provided songs (you might know some of them) and see how can DeejAI improvise their continuation.'
+        font_size: st.TEXT_FONT_SIZE
+        size_hint: 1, 0.2
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: 1, 0.6
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Wanna give it a try with one of these songs?'
+                font_size: st.TEXT_FONT_SIZE
+                size_hint: 1, 0.2
+            MelodiesList:
+                id: melodies_list
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+            padding: 100, 0, 100, 50
+            Label:
+                text: 'You have your own song? Upload your MIDI file:'
+                font_size: st.TEXT_FONT_SIZE
+                size_hint: 1, 0.2
+            MidiFileUpload:
+                id: midi_upload
+    Label:
+        text: "Selected song: -"
+        id: selected_melody
+        size_hint: 1, 0.1
+        text_size: root.width, st.TEXT_FONT_SIZE + 15
+        halign: 'center'
+        valign: 'middle'
+    MagicalNumber:
+        id: magical_number
+        size_hint: 1, 0.1
+
+
 
 <AccompanyMelody>:
     orientation: 'vertical'
@@ -133,8 +173,7 @@
         background_color: 255, 255, 255, 1
         color: 0, 0, 0, 1
         on_press: root.switch_tab(self)
-        Label:
-            text: 'Continue from track blah blah...'
+        ContinueTrack
 
 
 <KiviUi>:
