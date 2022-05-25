@@ -1,9 +1,12 @@
 import os.path
 
+from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.lang import Builder
+from kivy.properties import NumericProperty
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.tabbedpanel import TabbedPanel
 
@@ -11,6 +14,21 @@ import stylesheet as st
 # MagicalNumber and MelodiesList NEEDS TO BE IMPORTED HERE (so kivy finds the class)
 from magical_number import MagicalNumber, MagicalNumberSubscriber
 from melodies_list import MelodiesList
+
+
+class GeneratingAnimation(FloatLayout):
+    angle = NumericProperty(0)
+
+    def __init__(self, **kwargs):
+        super(GeneratingAnimation, self).__init__(**kwargs)
+        anim = Animation(angle=360, duration=2)
+        anim += Animation(angle=360, duration=2)
+        anim.repeat = True
+        anim.start(self)
+
+    def on_angle(self, item, angle):
+        if angle == 360:
+            item.angle = 0
 
 
 class ComposeFromScratchMeta(type(BoxLayout), type(MagicalNumberSubscriber)):
@@ -21,10 +39,14 @@ class ComposeFromScratch(BoxLayout, MagicalNumberSubscriber, metaclass=ComposeFr
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_once(lambda dt: self.ids.magical_number.subscribe(self))
+        self.is_generating = False
 
     def update(self, number: int):
         # TODO: Generate music with AI
         print(f"Composing from scratch with number {number}")
+        if not self.is_generating:
+            self.add_widget(GeneratingAnimation())
+            self.is_generating = True
 
 
 class MidiFileUpload(StackLayout):
