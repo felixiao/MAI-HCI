@@ -5,41 +5,71 @@ from cv2 import ROTATE_90_COUNTERCLOCKWISE
 from cv2 import ROTATE_180
 import numpy as np
 import imutils
+from torch import embedding
 
 class Calibration():
-    def __init__(self,calibImagePath,capImagePath):
+    def __init__(self,calibImagePath,capImagePath,SCREEN_WIDTH,SCREEN_HEIGHT):
         self.capturedImagePath = capImagePath
         self.calibimage = cv2.imread(calibImagePath)
         self.capturedImage = None
         self.transformMatrix = None
         self.dsize = None
+        self.SCREEN_WIDTH = SCREEN_WIDTH
+        self.SCREEN_HEIGHT= SCREEN_HEIGHT
 
-    def Capture(self):
-        SCREEN_WIDTH = 1080
-        SCREEN_HEIGHT= 720
-        cap = cv2.VideoCapture(0)
-
+    def Capture(self,cameraIndex=0,embeddedcam = True):
+        cap = cv2.VideoCapture(cameraIndex)
+        brightness = 127
+        visualize = False
+        # embeddedcam = False
         while cap.isOpened():
             _, frame = cap.read()
             if frame is None:
                 break
-            cv2.imshow("Cam", frame)
-            # whiteboard = np.ones((SCREEN_HEIGHT,SCREEN_WIDTH,3),dtype=np.uint8)*127
-            cv2.imshow("original", self.calibimage)
+            camimg = cv2.resize(frame,(self.SCREEN_WIDTH//2,self.SCREEN_HEIGHT//2))
+            if visualize:
+                gray_img = cv2.cvtColor(camimg, cv2.COLOR_BGR2GRAY)
+                blurred = cv2.GaussianBlur(gray_img, (9, 9), 0)             # 高斯模糊去噪（设定卷积核大小影响效果）
+                _, RedThresh = cv2.threshold(blurred, 122, 255, cv2.THRESH_BINARY)  # 设定阈值165（阈值影响开闭运算效果)
+
+
+            whiteboard = np.ones((self.SCREEN_HEIGHT,self.SCREEN_WIDTH,3),dtype=np.uint8)*brightness
+            if embeddedcam:
+                cv2.destroyWindow('Cam')
+                camimg_resize= cv2.resize(camimg,(camimg.shape[1]//2,camimg.shape[0]//2))
+                whiteboard[10:10+camimg_resize.shape[0],10:10+camimg_resize.shape[1],:] =camimg_resize
+                if visualize:
+                    RedThresh_resize = cv2.resize(RedThresh,(RedThresh.shape[1]//2,RedThresh.shape[0]//2))
+                    RedThresh_resize = cv2.cvtColor(RedThresh_resize, cv2.COLOR_GRAY2RGB)
+                    whiteboard[10:10+RedThresh_resize.shape[0],10+camimg_resize.shape[1]:10+camimg_resize.shape[1]+RedThresh_resize.shape[1],:] =RedThresh_resize
+            else:
+                cv2.imshow("Cam", camimg)
+            cv2.imshow("original", whiteboard)
             key = cv2.waitKey(1) & 0xFF    
             if key == ord('c'):
                 self.capturedImage = frame
                 cv2.imwrite(self.capturedImagePath,frame)
                 break
+            elif key == ord('w'):
+                brightness=(brightness+10)%255
+            elif key == ord('q'):
+                return False
+            elif key == ord('e'):
+                embeddedcam = not embeddedcam
+                
+            elif key == ord('v'):
+                visualize = not visualize
         cap.release()
         cv2.destroyAllWindows()
+        return True
     
-    def QuadDetection(self,show=False,blursize=9,threshold=127):
+    def QuadDetection(self,show=False,blursize=9,threshold=122):
         if self.capturedImage is None:
             self.capturedImage = cv2.imread(self.capturedImagePath)
         gray_img = cv2.cvtColor(self.capturedImage, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray_img, (blursize, blursize), 0)             # 高斯模糊去噪（设定卷积核大小影响效果）
-        _, RedThresh = cv2.threshold(blurred, threshold, 255, cv2.THRESH_BINARY)  # 设定阈值165（阈值影响开闭运算效果）
+        _, RedThresh = cv2.threshold(blurred, threshold, 255, cv2.THRESH_BINARY)  # 设定阈值165（阈值影响开闭运算效果)
+        # cv2.imwrite('Threshold.jpg',RedThresh)
         # cv2.imwrite('binary.jpg',RedThresh)
         cnts = cv2.findContours(RedThresh.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         cnts = imutils.grab_contours(cnts)
