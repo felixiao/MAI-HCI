@@ -39,9 +39,13 @@ class ShapeTracker():
             rotatedRect = cv2.minAreaRect(c)
             # vertices = cv2.RotatedRect.points(rotatedRect)
             # print(rotatedRect)
-        
+
             if drawImg is not None:
-                cv2.polylines(image,[np.array(approx)],True,(0,255,0),2)
+                scaleX = drawImg.shape[0]/image.shape[0]
+                scaleY = drawImg.shape[1]/image.shape[1]
+                approx = np.array([[ap[0]*scaleX,ap[1]*scaleY] for ap in approx],dtype=np.int32)
+
+                cv2.polylines(drawImg,[np.array(approx)],True,(0,255,0),2)
                 # cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
 
                 # for i in range(4):
